@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bubble Pop Game</title>
+    <style>
+        body { text-align: center; }
+        canvas { background-color: #f0f0f0; border: 1px solid black; }
+    </style>
+</head>
+<body>
+    <h1>Bubble Pop Game</h1>
+    <canvas id="gameCanvas" width="480" height="320"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let bubbles = [];
+        let score = 0;
+
+        function Bubble(x, y, radius, speed) {
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.speed = speed;
+        }
+
+        Bubble.prototype.draw = function() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+        };
+
+        Bubble.prototype.update = function() {
+            this.y += this.speed;
+            if (this.y - this.radius > canvas.height) {
+                this.y = 0 - this.radius;
+                this.x = Math.random() * canvas.width;
+            }
+        };
+
+        function generateBubbles(num) {
+            for (let i = 0; i < num; i++) {
+                let radius = Math.random() * 20 + 10;
+                let x = Math.random() * (canvas.width - radius * 2) + radius;
+                let y = Math.random() * canvas.height - canvas.height;
+                let speed = Math.random() * 2 + 1;
+                bubbles.push(new Bubble(x, y, radius, speed));
+            }
+        }
+
+        function drawScore() {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#000';
+            ctx.fillText('Score: ' + score, 8, 20);
+        }
+
+        function updateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            bubbles.forEach(bubble => {
+                bubble.update();
+                bubble.draw();
+            });
+            drawScore();
+            requestAnimationFrame(updateGame);
+        }
+
+        canvas.addEventListener('click', function(event) {
+            let rect = canvas.getBoundingClientRect();
+            let mouseX = event.clientX - rect.left;
+            let mouseY = event.clientY - rect.top;
+
+            bubbles.forEach((bubble, index) => {
+                let dist = Math.sqrt((mouseX - bubble.x) ** 2 + (mouseY - bubble.y) ** 2);
+                if (dist < bubble.radius) {
+                    score++;
+                    bubbles.splice(index, 1);
+                }
+            });
+        });
+
+        generateBubbles(10);
+        updateGame();
+    </script>
+</body>
+</html>
