@@ -68,7 +68,7 @@ canvas.addEventListener('click', (e) => {
 
     balls.forEach((ball, index) => {
         const dist = Math.sqrt((x - ball.x) ** 2 + (y - ball.y) ** 2);
-        if (dist < ball.radius) {
+        if (dist < ball.radius*1.5) {
             balls.splice(index, 1);
             spawnBall();
             score += 10;
