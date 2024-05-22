@@ -69,19 +69,14 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-canvas.addEventListener('mousedown', (e) => {
+function startDrawing(x, y) {
     isDrawing = true;
-    const rect = canvas.getBoundingClientRect();
-    lastX = e.clientX - rect.left;
-    lastY = e.clientY - rect.top;
-});
+    lastX = x;
+    lastY = y;
+}
 
-canvas.addEventListener('mousemove', (e) => {
+function drawAndCheckCollision(x, y) {
     if (!isDrawing) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
 
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
@@ -99,11 +94,40 @@ canvas.addEventListener('mousemove', (e) => {
 
     lastX = x;
     lastY = y;
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    startDrawing(e.clientX - rect.left, e.clientY - rect.top);
 });
 
-canvas.addEventListener('mouseup', () => {
-    isDrawing = false;
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    drawAndCheckCollision(e.clientX - rect.left, e.clientY - rect.top);
 });
+
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseleave', stopDrawing);
+
+canvas.addEventListener('touchstart', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    drawAndCheckCollision(touch.clientX - rect.left, touch.clientY - rect.top);
+    e.preventDefault(); // Dokunma olayının varsayılan davranışını engelle
+});
+
+canvas.addEventListener('touchend', stopDrawing);
+canvas.addEventListener('touchcancel', stopDrawing);
 
 window.addEventListener('resize', () => {
     canvasWidth = window.innerWidth;
