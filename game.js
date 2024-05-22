@@ -13,6 +13,9 @@ let lastY = 0;
 const ballImage = new Image();
 ballImage.src = 'ball.png'; // PNG dosyasının adını buraya yazın
 
+const backgroundImage = new Image();
+backgroundImage.src = 'background.png'; // Arka plan PNG dosyasının adını buraya yazın
+
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
@@ -58,6 +61,7 @@ function init() {
 
 function update() {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.drawImage(backgroundImage, 0, 0, canvasWidth, canvasHeight);
     balls.forEach(ball => {
         ball.update();
         ball.draw();
@@ -136,7 +140,10 @@ window.addEventListener('resize', () => {
     canvas.height = canvasHeight;
 });
 
-ballImage.onload = () => {
+Promise.all([
+    new Promise(resolve => ballImage.onload = resolve),
+    new Promise(resolve => backgroundImage.onload = resolve)
+]).then(() => {
     init();
     gameLoop();
-};
+});
