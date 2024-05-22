@@ -7,6 +7,9 @@ let score = 0;
 let canvasWidth = window.innerWidth;
 let canvasHeight = window.innerHeight;
 
+const ballImage = new Image();
+ballImage.src = 'ball.png'; // PNG dosyasının adını buraya yazın
+
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
@@ -16,24 +19,10 @@ class Ball {
         this.y = y;
         this.radius = radius;
         this.speed = speed;
-        this.color = this.getRandomColor();
-    }
-
-    getRandomColor() {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
     }
 
     draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.closePath();
+        ctx.drawImage(ballImage, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
     }
 
     update() {
@@ -95,5 +84,7 @@ window.addEventListener('resize', () => {
     canvas.height = canvasHeight;
 });
 
-init();
-gameLoop();
+ballImage.onload = () => {
+    init();
+    gameLoop();
+};
