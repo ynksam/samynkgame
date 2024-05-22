@@ -7,15 +7,11 @@ let score = 0;
 let canvasWidth = window.innerWidth;
 let canvasHeight = window.innerHeight;
 
-const ballSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="50" fill="#ff0000"/>
-</svg>`;
+const ballImage = new Image();
+ballImage.src = 'ball.png'; // PNG dosyasının adını buraya yazın
 
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
-
-let isDragging = false;
-let lastX, lastY;
 
 class Ball {
     constructor(x, y, radius, speed) {
@@ -23,12 +19,10 @@ class Ball {
         this.y = y;
         this.radius = radius;
         this.speed = speed;
-        this.image = new Image();
-        this.image.src = 'data:image/svg+xml;base64,' + btoa(ballSVG);
     }
 
     draw() {
-        ctx.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+        ctx.drawImage(ballImage, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
     }
 
     update() {
@@ -41,7 +35,7 @@ class Ball {
 }
 
 function spawnBall() {
-    const radius = Math.random() * 30 + 10;
+    const radius = Math.random() * 40 + 10;
     const x = Math.random() * (canvasWidth - radius * 2) + radius;
     const y = Math.random() * -canvasHeight;
     const speed = Math.random() * 3 + 2;
@@ -67,37 +61,20 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-function checkCollision(x1, y1, x2, y2, r) {
-    return Math.hypot(x2 - x1, y2 - y1) < r;
-}
-
-canvas.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-
-    const currentX = e.clientX;
-    const currentY = e.clientY;
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     balls.forEach((ball, index) => {
-        if (checkCollision(lastX, lastY, ball.x, ball.y, ball.radius) || checkCollision(currentX, currentY, ball.x, ball.y, ball.radius)) {
+        const dist = Math.sqrt((x - ball.x) ** 2 + (y - ball.y) ** 2);
+        if (dist < ball.radius) {
             balls.splice(index, 1);
             spawnBall();
             score += 10;
             scoreElement.textContent = `Score: ${score}`;
         }
     });
-
-    lastX = currentX;
-    lastY = currentY;
-});
-
-canvas.addEventListener('mouseup', () => {
-    isDragging = false;
 });
 
 window.addEventListener('resize', () => {
@@ -107,5 +84,7 @@ window.addEventListener('resize', () => {
     canvas.height = canvasHeight;
 });
 
-init();
-gameLoop();
+ballImage.onload = () => {
+    init();
+    gameLoop();
+};
