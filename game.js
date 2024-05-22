@@ -6,6 +6,9 @@ let balls = [];
 let score = 0;
 let canvasWidth = window.innerWidth;
 let canvasHeight = window.innerHeight;
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
 
 const ballImage = new Image();
 ballImage.src = 'ball.png'; // PNG dosyasının adını buraya yazın
@@ -31,6 +34,11 @@ class Ball {
             this.y = -this.radius;
             this.x = Math.random() * canvasWidth;
         }
+    }
+
+    intersectsLine(x1, y1, x2, y2) {
+        const dist = Math.abs((y2 - y1) * this.x - (x2 - x1) * this.y + x2 * y1 - y2 * x1) / Math.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2);
+        return dist < this.radius;
     }
 }
 
@@ -61,20 +69,40 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-canvas.addEventListener('click', (e) => {
+canvas.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
     balls.forEach((ball, index) => {
-        const dist = Math.sqrt((x - ball.x) ** 2 + (y - ball.y) ** 2);
-        if (dist < ball.radius) {
+        if (ball.intersectsLine(lastX, lastY, x, y)) {
             balls.splice(index, 1);
             spawnBall();
             score += 10;
             scoreElement.textContent = `Score: ${score}`;
         }
     });
+
+    lastX = x;
+    lastY = y;
+});
+
+canvas.addEventListener('mouseup', () => {
+    isDrawing = false;
 });
 
 window.addEventListener('resize', () => {
