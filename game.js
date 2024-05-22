@@ -35,7 +35,7 @@ class Ball {
 }
 
 function spawnBall() {
-    const radius = Math.random() * 40 + 10;
+    const radius = Math.random() * 50 + 20;
     const x = Math.random() * (canvasWidth - radius * 2) + radius;
     const y = Math.random() * -canvasHeight;
     const speed = Math.random() * 3 + 2;
