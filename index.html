@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Click Counter</title>
+    <style>
+        .circle {
+            width: 100px;
+            height: 100px;
+            background-color: blue;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="circle" id="circle">0</div>
+
+    <script>
+        let score = 0;
+        const circle = document.getElementById('circle');
+        circle.addEventListener('click', () => {
+            score++;
+            circle.textContent = score;
+        });
+
+        // Telegram Web App Initialization
+        Telegram.WebApp.ready();
+    </script>
+</body>
+</html>
